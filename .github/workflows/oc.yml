@@ -6,7 +6,7 @@
 # Blog: wkdaily.cpolar.top
 #=================================================
 
-name: Make OpenClash run files 
+name: Make OpenClash run files
 
 on:
   workflow_dispatch:
@@ -18,42 +18,42 @@ jobs:
     steps:
       - name: Create OpenClash & openclash directory for git & ipk
         run: mkdir -p OpenClash openclash-x86 openclash-a53
-        
+
       - name: Checkout package branch to OpenClash directory
         uses: actions/checkout@v4
         with:
           repository: vernesong/OpenClash
           path: OpenClash
           ref: package
-          
+
       - name: Copy latest openclash IPK to openclash directory
         run: |
-          cp OpenClash/master/*.ipk openclash-x86
-          cp OpenClash/master/*.ipk openclash-a53
+          cp OpenClash/dev/*.ipk openclash-x86
+          cp OpenClash/dev/*.ipk openclash-a53
 
       - name: Get version info
         id: extract_version
         run: |
-          first_line=$(head -n 1 OpenClash/master/version)
+          first_line=$(head -n 1 OpenClash/dev/version)
           echo "version=$first_line" >> $GITHUB_ENV
 
       - name: Create Meta directory for git
         run: mkdir Meta
-      
+
       - name: Checkout core branch to Meta directory
         uses: actions/checkout@v4
         with:
           repository: vernesong/OpenClash
           path: Meta
           ref: core
-      
+
       - name: list all cores on core branch
-        run: ls Meta/master/meta
+        run: ls Meta/dev/meta
 
       - name: Copy latest meta core to openclash directory
         run: |
-          tar -xzvf Meta/master/meta/clash-linux-amd64.tar.gz -C openclash-x86
-          tar -xzvf Meta/master/meta/clash-linux-arm64.tar.gz -C openclash-a53
+          tar -xzvf Meta/dev/meta/clash-linux-amd64.tar.gz -C openclash-x86
+          tar -xzvf Meta/dev/meta/clash-linux-arm64.tar.gz -C openclash-a53
           mv openclash-x86/clash openclash-x86/clash_meta
           mv openclash-a53/clash openclash-a53/clash_meta
           ls openclash-x86
@@ -83,10 +83,9 @@ jobs:
           chmod +x openclash-a53/install.sh
 
       - name: Clone makeself repository for self-extracting installer
-        run: | 
+        run: |
           git clone https://github.com/megastep/makeself.git
 
-      
       - name: move openclash directory to makeself & create run
         run: |
           mv openclash-x86 makeself/
